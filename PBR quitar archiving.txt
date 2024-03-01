@@ -1,0 +1,9 @@
+SELECT owner_name,  
+     table_name,  
+     flashback_archive_name,  
+     archive_table_name,  
+     status , 'ALTER TABLE PBR.'|| table_name ||' NO FLASHBACK ARCHIVE;'
+ FROM  dba_flashback_archive_tables  
+ ORDER BY owner_name, table_name;
+
+commit;

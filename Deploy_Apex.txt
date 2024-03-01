@@ -1,0 +1,23 @@
+1) Cambiar sesión al Esuqema de metadatos
+ALTER SESSION SET CURRENT_SCHEMA = APEX_200200;
+
+2) Declarar datos del Workspace
+declare
+    l_workspace_id number;
+begin
+    select workspace_id into l_workspace_id
+      from apex_workspaces
+     where workspace = 'MODULOS'; --NOMBRE DE ESQUEMA
+    --
+    apex_application_install.set_workspace_id( l_workspace_id );
+    apex_application_install.generate_offset;
+    apex_application_install.set_schema('MODULOS'); --ESQUEMA DE BASE DE DATOS
+    apex_application_install.set_application_alias('MODULOS'); --ALIAS
+end;
+/
+
+3) Correr SQL
+@C:\f100.sql
+
+
+

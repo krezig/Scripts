@@ -1,0 +1,21 @@
+Archivos .tar.gz:
+Comprimir: tar -czvf empaquetado.dmp /carpeta/a/empaquetar/
+Descomprimir: tar -xzvf archivo.tar.gz
+
+Archivos .tar:
+Empaquetar: tar cvfz paquete.tar /dir/a/comprimir/
+Desempaquetar: tar -xvf paquete.tar
+
+Archivos .gz:
+Comprimir: gzip -9 index.php
+Descomprimir: gzip -d index.php.gz
+Descomprimir: gunzip -c fichero.dmp.gz > /directorio/subdirectorio/fichero.dmp
+
+Archivos .zip:
+Comprimir: zip -r archivo.zip /carpeta/compresa
+Descomprimir: unzip archivo.zip
+Descomprimir varios: unzip "*.zip"
+
+Archivos .tgz:
+Empaquetar: tar pscvfz paquete.tar /dir/a/comprimir/
+Desempaquetar: tar -xvzf /path/to/yourfile.tgz -C /path/where/to/extract/

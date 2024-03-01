@@ -1,0 +1,37 @@
+1 -- Identificar y colocar el SPID de S.O. del TOP.
+select SID, s.SERIAL#, SPID from v$session s, v$process p
+     where s.paddr=p.addr and SPID='29867';
+
+2 -- Extraer los 2 campos de la consulta anterior para detalles de la sesión 
+select * from v$session where SID = 1185 AND SERIAL# = 9660;
+     
+
+3 -- Extraer el SQL_ID de la consulta anterior para mostrar el query ejecutado 
+select SQL_FULLTEXT Completo, SQL_ID, EXECUTIONS Ejecuciones, FIRST_LOAD_TIME Inicio, CONCURRENCY_WAIT_TIME, USER_IO_WAIT_TIME, PARSING_SCHEMA_NAME Esquema,ELAPSED_TIME,OBJECT_STATUS 
+from V$SQL
+where SQL_ID = 'gcf7frf8dn3y3';
+
+4 -- En caso de ser necesario terminar con la sesión inmeidatamente
+ALTER SYSTEM KILL SESSION '1817,30111' IMMEDIATE;
+
+
+select SID, s.SERIAL#, SPID from v$session s, v$process p 
+     where s.paddr=p.addr;
+     
+
+-- TOP SQL
+SELECT * FROM
+(SELECT
+    parsing_schema_name Esquema,
+    sql_fulltext Consulta,
+    sql_id,
+    elapsed_time,
+    child_number,
+    disk_reads,
+    executions Ejecuciones,
+    first_load_time "Primera Ejecución",
+    last_load_time "Última Ejecución"
+FROM    v$sql
+ORDER BY elapsed_time DESC)
+WHERE ROWNUM < 20
+/

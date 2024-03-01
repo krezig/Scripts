@@ -1,0 +1,25 @@
+--Consultar Directorios
+select * from ALL_DIRECTORIES
+order by 2;
+
+--Crear Directorio
+CREATE OR REPLACE DIRECTORY certificados_ac_sat AS '/u02/certificados';
+CREATE OR REPLACE DIRECTORY PP_TOMOS_GENERAR AS '/u01/PBR/Tomos/GenerarTomo1';
+
+--Otorgar permisos a directorio
+grant read,write on directory PP_TOMOS to APEX_PUBLIC_USER;
+grant read,write on directory PP_TOMOS to APEX_PUBLIC_USER;
+
+grant read,write on directory RECACSV_DIR to PBR;
+grant read,write on directory PP_TOMOS to PBR;
+
+
+
+
+grant read,write on directory certificados_ac_sat to RECAUDADOR;
+grant read,write on directory certificados_ac_sat to OBLI_RECAUDADOR;
+grant read,write on directory certificados_ac_sat to RELOG_RECAUDADOR;
+grant read,write on directory certificados_ac_sat to FACTURACION;
+grant read,write on directory certificados_ac_sat to APEX_180200;
+grant read,write on directory certificados_ac_sat to APEX_PUBLIC_USER;
+grant read,write on directory certificados_ac_sat to INTEGRACION;

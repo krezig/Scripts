@@ -1,0 +1,4 @@
+yum install -y libXext.i686
+yum install -y libXrender.i686
+yum install -y libXtst.i686
+yum install -y libc.so.6

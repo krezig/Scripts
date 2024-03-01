@@ -1,0 +1,28 @@
+REPORTES AWR
+1.- Cargar variables y Ejecutar Script (Elegir el adecuado deacuerdo al producto instalado)
+   	@/u01/app/oracle/product/12.2.0/db_1/rdbms/admin/awrrpt.sql
+	@/u01/app/oracle/12.1.0/rdbms/admin/awrrpt.sql
+	@awrrpt.sql
+	@/u02/app/oracle/product/11.2.0/dbhome_4/rdbms/admin/awrrpt.sql
+2.- Elegir Fomrato (Texto plano, HTML).
+3.- Elegir el número de días atras que se buscará analisar los Snaps. (1)
+4.- Elegir ID de inicio.
+5.- Elegir ID de termino.
+6.- Elegir un nombre para el reporte con Formato = repAWR_<dbname>_<fecha>.html   
+7.- Identificar el reporte generado desde la ruta donde se ejecutó el Script @awrrpt.sql
+8.- Recopilar el archivo con extención HTML para su envío.
+
+
+
+REPORTES ADDM
+1.- Cargar variables y Ejecutar Script.
+   	@/u01/app/oracle/product/12.2.0/db_1/rdbms/admin/addmrpt.sql
+	@/u01/app/oracle/12.1.0/rdbms/admin/addmrpt.sql
+	@addmrpt.sqlo
+@/u02/app/oracle/product/11.2.0/dbhome_4/rdbms/admin/awrrpt.sql
+2.- Elegir Fomrato (Texto plano, HTML).
+3.- Elegir ID de inicio.
+4.- Elegir ID de termino.
+5.- Elegir un nombre para el reporte= repADDM_<dbname>_<fecha>.html   [*.html]
+6.- Identificar el reporte generado desde la ruta donde se ejecutó el Script @addmrpt.sql
+7.- Recopilar el archivo con extención HTML para su envío.

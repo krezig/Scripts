@@ -1,0 +1,53 @@
+
+
+1) Dar permisos invidualmente a un objeto
+GRANT EXECUTE ON recaudador.aa_usuarios TO obli_recaudador;
+commit;
+
+
+2) Dar permisos a una serie de objetos, modo recursivo
+BEGIN
+   FOR i IN (SELECT owner, table_name FROM all_tables WHERE owner='TEST_RECMCUU_RELOG') LOOP
+      EXECUTE IMMEDIATE 'GRANT SELECT, INSERT, UPDATE, DELETE ON '||i.owner||'.'||i.table_name||' TO TEST_RECMCUU_OBLI';
+   END LOOP;
+END; 
+
+commit;
+
+
+
+3) Todas las tablas de 1 Esquema
+Select Owner, Table_Name, 'GRANT SELECT ON '|| Owner||'.'||Table_Name||' to ISSET_CATALOGOS;' "Permiso"
+from dba_Tables 
+where owner = 'PBR';
+
+
+	3.1) Todas las tablas de varios Esquema
+	Select Owner, Table_Name, 'GRANT SELECT, UPDATE, INSERT, DELETE ON '|| Owner||'.'||Table_Name||' to ISSET_CATALOGOS;' "Permiso"
+        From All_Tables 
+        Where Owner IN ('ORDS_METADATA','APEX_200200');
+
+	3.2) Secuencias
+	 Select Owner, 'GRANT SELECT,ALTER ON '|| Owner||'.'||OBJECT_NAME||' to UTP3;' "Permiso"
+        From DBA_OBJECTS         
+        Where Owner IN ('RELOG_RECAUDADOR','RECAUDADOR','OBLI_RECAUDADOR')
+        AND OBJECT_TYPE = 'SEQUENCE';
+
+
+4) Permiso solo a funciones
+SELECT OBJECT_TYPE,OWNER,OBJECT_NAME , 'GRANT EXECUTE ON OBLI_RECAUDADOR.'||object_name||' TO UTP3;' "Permiso"
+FROM DBA_OBJECTS
+WHERE OWNER = 'OBLI_RECAUDADOR'
+AND object_type IN ('PROCEDURE','FUNCTION','PACKAGE','TYPE') order by 3; 
+
+5) Todos los objetos de un Esuqema a otro
+BEGIN
+  FOR t IN (SELECT object_name, object_type FROM all_objects WHERE owner='TEST_RECMCUU' AND object_type IN ('TABLE','VIEW','PROCEDURE','FUNCTION','PACKAGE','TRIGGER')) LOOP    --Definir 1° Esquema
+    IF t.object_type IN ('TABLE','VIEW') THEN
+      EXECUTE IMMEDIATE 'GRANT SELECT, UPDATE, INSERT, DELETE ON TEST_RECMCUU.'||t.object_name||' TO UT3';                                                                      --Definir 1° y 2° Esquema
+    ELSIF t.object_type IN ('PROCEDURE','FUNCTION','PACKAGE') THEN
+      EXECUTE IMMEDIATE 'GRANT EXECUTE ON TEST_RECMCUU.'||t.object_name||' TO UT3';                                                                                             --Definir 1° y 2° Esquema
+    END IF;
+  END LOOP;
+END;
+/

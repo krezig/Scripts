@@ -1,0 +1,63 @@
+SELECT DISTINCT c.USER_CONCURRENT_PROGRAM_NAME,round(((sysdate-a.actual_start_date)*24*60*60/60),2) AS Process_time, d.user_name,
+a.request_id,a.parent_request_id,a.request_date,a.actual_start_date,a.actual_completion_date,(a.actual_completion_date-a.request_date)*24*60*60 AS end_to_end,
+(a.actual_start_date-a.request_date)*24*60*60 AS lag_time, a.phase_code,a.status_code,a.argument_text,a.priority
+FROM   apps.fnd_concurrent_requests a,apps.fnd_concurrent_programs b,apps.FND_CONCURRENT_PROGRAMS_TL c,apps.fnd_user d
+WHERE  a.concurrent_program_id=b.concurrent_program_id AND b.concurrent_program_id=c.concurrent_program_id AND
+a.requested_by=d.user_id AND status_code='R' order by Process_time desc;
+
+update fnd_concurrent_requests
+ set status_code='X', phase_code='C'
+ where request_id IN (4069737,
+4069758,
+4069723,
+4069809,
+4069734,
+4069731)
+and status_code = 'R'
+and ORACLE_PROCESS_ID is null
+and OS_PROCESS_ID is null;
+(ese no lo corra)
+
+select
+  c.owner,
+  c.object_name,
+  c.object_type,
+  b.sid,
+  b.serial#,
+  b.status,
+  b.osuser,
+  b.machine
+from
+  v$locked_object a ,
+  v$session b,
+  dba_objects c
+where
+  b.sid = a.session_id
+and
+  a.object_id = c.object_id
+and b.status = 'ACTIVE';
+
+
+SELECT s1.username
+|| '@'
+|| s1.machine
+|| ' ( SID='
+|| s1.SID
+|| ' ) is blocking '
+|| s2.username
+|| '@'
+|| s2.machine
+|| ' ( SID='
+|| s2.SID
+|| ' ) ' AS blocking_status
+FROM gv$lock l1,
+gv$session s1,
+gv$lock l2,
+gv$session s2
+WHERE s1.SID = l1.SID
+AND s2.SID = l2.SID
+AND l1.BLOCK = 1
+AND l2.request > 0
+AND l1.id1 = l2.id1
+AND l2.id2 = l2.id2;
+select INST_ID,SID,SERIAL#,USERNAME,STATUS,MACHINE,PROGRAM,MODULE,ACTION from gv$session where SID=624 or SID=416 order by SID;

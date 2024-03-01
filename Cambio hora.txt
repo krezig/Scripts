@@ -1,0 +1,13 @@
+== SO
+date --set "2022-7-01 16:00:00"
+             año mes dia h m s
+timedatectl set-time 2021-12-28 12:11:00
+		     año mes dia h m  s
+== DB
+Cambiar hora base de datos
+ALTER SYSTEM SET FIXED_DATE='2022-01-31-16:58:00';
+
+SELECT TO_CHAR(SYSDATE, 'DD-MM-YYYY HH24:MI:SS') as "TIEMPO" FROM dual;
+
+Regresar Hora a actual
+ALTER SYSTEM SET FIXED_DATE=NONE;

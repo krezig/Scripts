@@ -1,0 +1,4 @@
+dbms_java.grant_permission( 'CP0001_SEDUE_TEST', 'SYS:java.lang.RuntimePermission', 'accessClassInPackage.com.sun.org.apache.xml.internal.security.utils', '' );
+
+dbms_java.grant_permission( 'TEST_APEX_SDUE', 'SYS:java.lang.RuntimePermission', 'accessClassInPackage.com.sun.org.apache.xml.internal.security.utils', '' )
+exec dbms_java.grant_permission( 'SDUE', 'SYS:java.lang.RuntimePermission', 'accessClassInPackage.com.sun.org.apache.xml.internal.security.utils', '' );

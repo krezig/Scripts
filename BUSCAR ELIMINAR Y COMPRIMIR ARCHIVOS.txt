@@ -1,0 +1,60 @@
+--Titulo de los archivos con ese texto
+grep -Ril "60097" /u01/app/oracle/product/11.1.1/fmw_1/user_projects/domains/base_domain/servers
+grep -rnw '/u01/app/oracle/product/11.1.2.4/fmw_2/user_projects/domains/rec_domain_12' -e 'JAVA_OPTIONS'
+
+
+--Buscar archivos en directorio mas viejos a "n" días
+find . -type f -mtime -2 -exec ls -lstr {} +
+
+--Eliminar archivos en directorio mas viejos a "n" días
+find . -type f -mtime +15 -delete
+
+--Eliminar archivos de .xxx Extensión
+find . -type f -name "*.gz" -exec rm -f {} \;
+
+--Contar todos los archvios en un directorio
+ls -1 | wc -l
+
+--Vaciar contenido de un archivo
+cat /dev/null > Archivo.Awk
+
+--Mover todos los archivos de x tiempo
+find -mtime +40 -exec mv "{}" /u01/outputs_20200626 \;
+
+--Mover todos los archvios de misma extensión
+mv **/*.zip /home/oracle/
+
+--Copiar todos los archvios de misma extensión
+cp **/*.ear /home/oracle/Backup
+
+--Comprimir todos los archivos de .xxx Extensión 
+find . -name '*.log*' -mtime +15 -type f -exec gzip {} \;
+
+--Listar todos los archivos de .xxx extensión y N dias o menos
+find . -type f -name "*.out" -mtime -30 -exec ls -lstr {} +
+
+--Comprimir todos los archivos de .xxx Extensión y N fecha o anterior
+find . -type f -name '*.PDF' -mtime +30 -type f -exec gzip {} +
+
+
+			      mtime -30       ( - Desde N dias hasta Hoy)
+
+Inicio				      N      			HOY
+|---------------------------------------------------------------|
+				      |---------30 dias---------|
+				      |            -            |
+						   
+
+
+	    		      mtime +30       ( + Desde Origen hasta N dias)
+
+Inicio				  N      			HOY
+|---------------------------------------------------------------|
+|-------------------------------------|		
+|                                     |
+	     80 dias
+		+
+
+
+
+

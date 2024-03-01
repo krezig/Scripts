@@ -1,0 +1,28 @@
+CORRER ESTADÍSTICAS
+
+EXECUTE DBMS_STATS.GATHER_SCHEMA_STATS(ownname => 'RECAUDADOR', estimate_percent => NULL);
+EXECUTE DBMS_STATS.GATHER_SCHEMA_STATS(ownname => 'RECAUDADOR');
+
+
+EXEC DBMS_STATS.gather_database_stats;
+EXEC DBMS_STATS.gather_dictionary_stats;
+
+
+Script Linux
+############
+
+#!/bin/bash
+
+. /home/oracle/.bash_profile
+
+export ORACLE_HOME=/sboracle-mxsam/19.0.0.0
+export ORACLE_BASE=/dboracle-mxsam
+export ORACLE_SID=mxsam
+export DATE=$(date +%y-%m-%d_%H%M%S)
+
+#### Gather HR schema stats ####
+sqlplus / as sysdba << EOF > /tmp/RECAUDADOR_stats_gather_$DATE.log
+EXEC DBMS_STATS.gather_schema_stats('RECAUDADOR');
+EOF
+
+echo "Stats gathered succeeded"

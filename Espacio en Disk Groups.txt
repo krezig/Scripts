@@ -1,0 +1,13 @@
+SELECT
+    name                                     "Disk_Group"
+  , state                                    "Estado"
+  , type                                     "Tipo"
+  , total_mb                                 "Espacio total"
+  , (total_mb - free_mb)                     "Utilizado"
+  , ROUND((1- (free_mb / total_mb))*100, 2)  "% de uso"
+FROM
+    v$asm_diskgroup
+ORDER BY
+    name
+/
+

@@ -1,0 +1,18 @@
+1) Consultar valores
+SELECT RESOURCE_NAME "Parametro", CURRENT_UTILIZATION "Uso actual", MAX_UTILIZATION "Maximo actual", LIMIT_VALUE "Limite"
+FROM V$RESOURCE_LIMIT
+WHERE RESOURCE_NAME IN ( 'sessions', 'processes','transactions');
+
+2) Estado de los Procesos
+select total, active, inactive, system, killed
+    from
+       (select count(*) total from v$session)
+     , (select count(*) system from v$session where username is null)
+     , (select count(*) active from v$session where status = 'ACTIVE' and username is not null)
+     , (select count(*) inactive from v$session where status = 'INACTIVE')
+     , (select count(*) killed from v$session where status = 'KILLED');
+
+3) Cambiar valores
+alter system set processes=1500 scope=spfile;
+alter system set sessions=2500 scope=spfile;
+ALTER SYSTEM SET open_cursors = 3000 SCOPE=BOTH;

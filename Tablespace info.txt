@@ -1,0 +1,80 @@
+select * from fnd_concurrent_requests where to_date(request_date,'DD/MM/YY HH24:MI:SS') >= to_date('02/03/20','DD/MM/YY HH24:MI:SS') order by request_date;
+
+
+select to_char(request_date,'DD/MM/YY HH24:MM:SS') from fnd_concurrent_requests where to_date(request_date,'DD/MM/YY HH24:MI:SS') >= to_date('02/03/20 00:00:00','DD/MM/YY HH24:MI:SS') order by request_date;
+
+describe fnd_concurrent_requests;
+
+select
+   *
+from (
+   select
+      owner,
+      segment_name,
+      bytes/1024/1024 meg,
+      tablespace_name
+   from
+      dba_segments
+   where
+      segment_type = 'TABLE'
+   order by
+      bytes/1024/1024 desc)
+where
+   rownum <= 10;
+   
+   select tablespace_name,segment_name from dba_segments where segment_name in ('MLOG$_AP_SUPPLIER_SITES_AL',
+'WF_ITEM_ATTRIBUTE_VALUES',
+'GL_JE_LINES',
+'STATS$SQL_SUMMARY',
+'GL_BALANCES',
+'GL_BC_PACKETS_HISTS',
+'STATS$SQL_PLAN_USAGE',
+'GL_IMPORT_REFERENCES',
+'SOURCE$',
+'WF_ITEM_ACTIVITY_STATUSES');
+
+select * from MLOG$_AP_SUPPLIER_SITES_AL;
+
+
+/*describe v$sql;
+
+describe dba_hist_sqltext;
+
+select to_char(sysdate,'DD/MM/YY HH:MM') from dual;
+
+select first_load_time , module,sql_id, sql_fulltext from v$sql;-- where first_load_time between '2020-01-28/14:00:28' and '2020-01-28/20:00:00';
+
+select RM_LAST_ACTION_TIME,PLSQL_EXEC_TIME,FIRST_REFRESH_TIME,LAST_REFRESH_TIME,to_char(SQL_EXEC_START,'DD/MM/YY HH24:MM:SS'),sql_text from v$sql_monitor where to_char(SQL_EXEC_START,'DD/MM/YY HH24:MM:SS') between '01/03/20 05:00:00' and '02/03/20 18:00:00' order by SQL_EXEC_START asc;
+
+
+*/
+
+
+SELECT DISTINCT c.USER_CONCURRENT_PROGRAM_NAME,round(((sysdate-a.actual_start_date)*24*60*60/60),2) AS Process_time, d.user_name,
+a.request_id,a.parent_request_id,to_char(a.request_date,'DD-MM-YY HH24:MM:SS'),a.actual_start_date,a.actual_completion_date,(a.actual_completion_date-a.request_date)*24*60*60 AS end_to_end,
+(a.actual_start_date-a.request_date)*24*60*60 AS lag_time, a.phase_code,a.status_code,a.argument_text,a.priority
+FROM apps.fnd_concurrent_requests a,apps.fnd_concurrent_programs b,apps.FND_CONCURRENT_PROGRAMS_TL c,apps.fnd_user d
+WHERE a.concurrent_program_id=b.concurrent_program_id
+ AND b.concurrent_program_id=c.concurrent_program_id
+ AND a.requested_by=d.user_id
+ AND to_char(a.request_date,'dd-mm-yyyy') = to_char(sysdate,'dd-mm-yyyy')
+ and to_date(A.request_date,'DD/MM/YY') >= to_date('02/03/20','DD/MM/YY')
+order by Process_time desc;
+
+
+select * from DBA_TABLESPACE_USAGE_METRICS;
+
+select * from v$tablespace;
+
+select USED_SPACE*8/1024,TABLESPACE_SIZE*8/1024 from DBA_TABLESPACE_USAGE_METRICS;
+
+select * from DBA_HIST_TBSPC_SPACE_USAGE;-- where tablespace_id=385;
+
+select * from dba_hist_sqltext;
+
+select * from v$sql;
+
+select * from v$sql_monitor order by SQL_EXEC_START asc;
+
+
+select dbid,TABLESPACE_SIZE*8/1024/1024,TABLESPACE_MAXSIZE*8/1024/1024,TABLESPACE_USEDSIZE*8/1024/1024,RTIME from DBA_HIST_TBSPC_SPACE_USAGE where tablespace_id=385 order by snap_id desc;

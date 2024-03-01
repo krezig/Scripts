@@ -1,0 +1,46 @@
+--Log de Shceduler
+	select * from DBA_SCHEDULER_JOBS 
+	where owner = 'PBR';
+
+--Jobs Corriendo en el Shceduler
+ 	select * from dba_scheduler_running_jobs;
+ 	select * from dba_jobs_running;
+ 
+--Log de Shceduler completos
+       select owner as schema_name,
+       job_name,
+       job_style,
+       case when job_type is null 
+                 then 'PROGRAM'
+            else job_type end as job_type,  
+       case when job_type is null
+                 then program_name
+                 else job_action end as job_action,
+       start_date,
+       case when repeat_interval is null
+            then schedule_name
+            else repeat_interval end as schedule,
+       last_start_date,
+       next_run_date,
+       state
+from sys.all_scheduler_jobs
+order by owner,
+         job_name;
+         
+
+--Log de JOBS
+	select * from DBA_SCHEDULER_JOB_LOG 
+	where owner in ('PBR') order by LOG_DATE DESC;
+       
+--Perimosos para Jobs
+       grant CREATE JOB to PBR;
+       grant CREATE any JOB to PBR;
+       grant EXECUTE ANY PROGRAM to PBR;
+       grant EXECUTE ANY CLASS to PBR;
+       
+--Consultar Estatus de los Jobs
+       select job_name, owner, enabled from dba_scheduler_jobs
+       where owner in ('PBR','APEX_180200') ;
+       
+--Activar Jobs
+       execute dbms_scheduler.enable('PBR.JOB_TOMO_1_V1');

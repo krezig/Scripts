@@ -1,0 +1,42 @@
+*  Listar sesiones
+select SID, SERIAL#, SCHEMANAME, STATUS 
+from v$session;
+
+*  Listar sesiones Activas(O inactivas)
+select SID, SERIAL#, SCHEMANAME, STATUS, 'ALTER SYSTEM KILL SESSION '''||sid||','||serial#||''' IMMEDIATE;'
+from v$session
+where status = 'INACTIVE';
+
+***Query terminar TODAS las sesiones*** OJO
+SELECT 'ALTER SYSTEM KILL SESSION '''||sid||','||serial#||''' IMMEDIATE;' FROM v$session;
+
+
+1) Listar query para terminar sesiones de determinado esquema
+SELECT 'ALTER SYSTEM KILL SESSION '''||sid||','||serial#||''' IMMEDIATE;' Query_kill , STATUS, program, machine FROM v$session
+where username = 'RECAUDADOR';
+
+	1.1) Listar query para terminar sesiones de determinado Usuario
+	   SELECT 'ALTER SYSTEM KILL SESSION '''||sid||','||serial#||''' IMMEDIATE;' Query_kill , STATUS FROM v$session
+           where lower(machine) like '%esaenz%';
+
+	1.2) Listar query para terminar sesiones Inactivas
+	   SELECT 'ALTER SYSTEM KILL SESSION '''||sid||','||serial#||''' IMMEDIATE;' Query_kill , STATUS FROM v$session
+           where status = 'INACTIVE'
+           and username = 'RECAUDADOR';
+
+	1.3) Listar sesiones de determinado Programa
+		SELECT 'ALTER SYSTEM KILL SESSION '''||sid||','||serial#||''' IMMEDIATE;' Query_kill , STATUS, program, machine FROM v$session
+		where username = 'MODULOS'
+		AND status = 'INACTIVE'
+		AND MACHINE = 'me.isset.gob.mx'
+		and WAIT_CLASS='Idle' and STATE='WAITING';
+
+2) Terminar sesiones de determinado esquema modo Recursivo
+
+BEGIN
+  FOR V IN (select sid,serial# from v$session where username='RECAUDADOR')
+  LOOP
+      EXECUTE IMMEDIATE 'alter system kill session ''' || V.sid  || ',' 
+        || V.serial# || ''' immediate';
+  END LOOP;
+END;

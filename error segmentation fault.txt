@@ -1,0 +1,25 @@
+[oracle@prodapph1 ~]$ opatch lsinventory
+[WARN ][jrockit] MaxPermSize=256m ignored: Not a valid option for JRockit
+Oracle Interim Patch Installer version 11.1.0.9.0
+Copyright (c) 2011, Oracle Corporation.  All rights reserved.
+
+/u01/app/oracle/product/11.1.2.4/fmw_1/oracle_common/OPatch/opatch: line 777: 13957 Segmentation fault      (core dumped) $JAVA $JAVA_VM_OPTION $JRE_MEMORY_OPTIONS -cp $BASE/ocm/lib/emocmclnt.jar:$CP/OraInstaller.jar:$CP/OraPrereq.jar:$CP/share.jar:$CP/srvm.jar:$CP/orai18n-mapping.jar:$CP/xmlparserv2.jar:$CP/emCfg.jar:$CP/ojmisc.jar:$BASE/jlib/opatch.jar:$BASE/jlib/opatchsdk.jar:$BASE/jlib/automation/automation.jar:$BASE/jlib/oracle.opatch.classpath.jar:$BASE/jlib/jaxb/activation.jar:$BASE/jlib/jaxb/jaxb-api.jar:$BASE/jlib/jaxb/jaxb-impl.jar:$BASE/jlib/jaxb/jsr173_1.0_api.jar:$BASE/jlib/osysmodel/OsysModel.jar -DOPatch.ORACLE_HOME=$OH -DOPatch.DEBUG=$DEBUGVAL -DOPatch.RUNNING_DIR=$BASE -DOPatch.MW_HOME=$MWH -DOPatch.WL_HOME=$WL_HOME -DOPatch.COMMON_COMPONENTS_HOME=$COMMON_COMPONENTS_HOME -DOPatch.OUI_LOCATION=$OUI_LOCATION -DOPatch.FMW_COMPONENT_HOME=$FMW_COMPONENT_HOME -DOPatch.OPATCH_CLASSPATH=$CLASSPATH -DOPatch.WEBLOGIC_CLASSPATH=$WEBLOGIC_CLASSPATH $FUSION_TRUST_OPTION ${oracleOcmService} ${_bootClassPath} oracle/opatch/OPatch $@ $invptr
+
+OPatch failed with error code 139
+
+
+JAVA_HOME=/u01/app/oracle/product/28.2.7/jr_1
+[oracle@prodapph1 ~]$ clear
+[oracle@prodapph1 ~]$ export JAVA_HOME
+[oracle@prodapph1 ~]$ PATH=$JAVA_HOME/bin:$PATH
+[oracle@prodapph1 ~]$ export PATH
+[oracle@prodapph1 ~]$ echo $JAVA_HOME
+
+
+./wlserver_10.3/common/bin/commEnv.sh
+./utils/quickstart/quickstart.sh
+./utils/uninstall/uninstall.sh
+./utils/bsu/bsu.sh
+
+
+USER_MEM_ARGS="-Xms2048m -Xmx2048m -XX:PermSize=1024m-XX:MaxPermSize=1024m"

@@ -1,0 +1,54 @@
+-- Crear ACL Recaudador
+BEGIN
+DBMS_NETWORK_ACL_ADMIN.CREATE_ACL (
+ acl          => 'ACL.xml',
+ description  => 'Producción Cloud',
+ principal    => 'PBR',
+ is_grant     => TRUE,
+ privilege    => 'connect',
+ start_date   => NULL,
+ end_date     => NULL);
+END;
+/
+
+
+-- Agregar HOST AL acl
+BEGIN
+DBMS_NETWORK_ACL_ADMIN.ASSIGN_ACL (
+ acl          => 'ACL_RECAUDADOR.xml',
+ host         => '*',
+ lower_port   => NULL,
+ upper_port   => NULL);
+END;
+/
+
+--Agregar usuario a una ACL existente
+BEGIN
+  DBMS_NETWORK_ACL_ADMIN.ADD_PRIVILEGE(
+    acl => 'ACL.xml', 
+    principal => 'PBR', 
+    is_grant => TRUE, 
+    privilege => 'connect');
+END;
+
+--Revisar ACL's
+select * from DBA_NETWORK_ACL_PRIVILEGES;
+select * from DBA_NETWORK_ACLS;
+
+
+--Otorgar permisos SMTP y HTTP A RECAUDADOR
+GRANT EXECUTE ON UTL_HTTP to RECAUDADOR;
+GRANT EXECUTE ON UTL_SMTP to RECAUDADOR;
+
+
+--Probar acceso
+DECLARE
+  l_url            VARCHAR2(50) := 'ldap.forumsys.com:389';
+  l_http_request   UTL_HTTP.req;
+  l_http_response  UTL_HTTP.resp;
+BEGIN
+  -- Hacemos una petición
+  l_http_request  := UTL_HTTP.begin_request(l_url);
+  l_http_response := UTL_HTTP.get_response(l_http_request);
+  UTL_HTTP.end_response(l_http_response);
+END;

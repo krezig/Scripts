@@ -1,0 +1,29 @@
+1) Crear partición
+fdisk -l
+
+fdisk /dev/xvdd
+
+p = Imprimir Tabla
+n = nueva partición   (2048 - 3333333131851)
+w = guardar tabla de particiones
+
+			Otra_tool=cfdisk /dev/xvdb
+2)Formatear partición
+mkfs.ext4 /dev/xvdb1
+mkfs -t ext4 /dev/xvdd1
+
+3)Montar partición
+mount -t ext4 /dev/xvdd /u02    <<>
+
+nano /etc/fstab
+Device		Direct	Formato	
+/dev/xvdd	/u02	ext4	defaults	0	0
+/dev/xvdb	/u01	ext4	defaults	0	0
+df -Th
+
+shutdown -r nr
+ow
+
+
+Mount ISO Linux
+mount /path/to/image.iso /media/iso -o loop

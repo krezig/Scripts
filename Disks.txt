@@ -1,0 +1,17 @@
+### Instalr smartmontools-5.43-3.el6.x86_64
+yum install -y smartmontools 
+
+### Listar Discos disponibles
+lsblk | grep disk
+
+### Analisar disco
+smartctl -t short /dev/sda1
+
+### Analisar disco
+smartctl -H /dev/sda1
+
+### Analisar disco
+smartctl -a /dev/sda1 >> /home/oracle/Documents/drive-report.txt
+
+###Badlock
+badblocks -v /dev/sdb1 >> badsectors.txt

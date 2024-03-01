@@ -1,0 +1,30 @@
+ [WARNING] [] [oracle.as.install.engine.modules.configuration.client.ConfigActionClassLoader] [tid: 14] [ecid: 0000MiFTO5LF0FWFLzQLOA1T4^aj000005,0]  [Action]: BI Configuration. Library not found: /u01/app/oracle/product/11.1.1.7/fmw_1/Oracle_BI1/bifoundation/admin/provisioning/sysmancommon.jar
+[2019-06-25T11:26:16.104-05:00] [as] [WARNING] [] [oracle.as.install.engine.modules.configuration.client.ConfigActionClassLoader] [tid: 14] [ecid: 0000MiFTO5LF0FWFLzQLOA1T4^aj000005,0]  [Action]: BI Configuration. Library not found: /u01/app/oracle/product/11.1.1.7/fmw_1/Oracle_BI1/install/config/biapps_scaleout_config.jar
+[2019-06-25T11:26:17.418-05:00] [as] [WARNING] [] [oracle.as.install.engine.modules.configuration.client.ConfigActionClassLoader] [tid: 14] [ecid: 0000MiFTO5LF0FWFLzQLOA1T4^aj000005,0]  [Action]: BI Configuration. Library not found: /u01/app/oracle/product/11.1.1.7/fmw_1/runtimes/com.ibm.jaxws.thinclient_7.0.0.jar
+[2019-06-25T11:26:17.418-05:00] [as] [WARNING] [] [oracle.as.install.engine.modules.configuration.client.ConfigActionClassLoader] [tid: 14] [ecid: 0000MiFTO5LF0FWFLzQLOA1T4^aj000005,0]  [Action]: BI Configuration. Library not found: /u01/app/oracle/product/11.1.1.7/fmw_1/runtimes/com.ibm.ws.admin.client_7.0.0.jar
+[2019-06-25T11:26:17.418-05:00] [as] [WARNING] [] [oracle.as.install.engine.modules.configuration.client.ConfigActionClassLoader] [tid: 14] [ecid: 0000MiFTO5LF0FWFLzQLOA1T4^aj000005,0]  [Action]: BI Configuration. Library not found: /u01/app/oracle/product/11.1.1.7/fmw_1/runtimes/com.ibm.ws.orb_7.0.0.jar
+[2019-06-25T11:26:17.418-05:00] [as] [WARNING] [] [oracle.as.install.engine.modules.configuration.client.ConfigActionClassLoader] [tid: 14] [ecid: 0000MiFTO5LF0FWFLzQLOA1T4^aj000005,0]  [Action]: BI Configuration. Library not found: /u01/app/oracle/product/11.1.1.7/fmw_1/runtimes/com.ibm.ws.ejb.thinclient_7.0.0.jar
+
+[2019-06-25T11:26:23.323-05:00] [as] [ERROR] [] [oracle.as.provisioning] [tid: 14] [ecid: 0000MiFTO5LF0FWFLzQLOA1T4^aj000005,0] [[
+oracle.as.provisioning.exception.ASProvWorkflowException: Error Executing workflow.
+        at oracle.as.provisioning.engine.WorkFlowExecutor._createDomain(WorkFlowExecutor.java:686)
+        at oracle.as.provisioning.engine.WorkFlowExecutor.executeWLSWorkFlow(WorkFlowExecutor.java:391)
+        at oracle.as.provisioning.engine.Config.executeConfigWorkflow_WLS(Config.java:866)
+        at oracle.as.install.bi.biconfig.standard.StandardWorkFlowExecutor.executeHelper(StandardWorkFlowExecutor.java:31)
+        at oracle.as.install.bi.biconfig.standard.DomainProvisioningTask.doExecute(DomainProvisioningTask.java:49)
+        at oracle.as.install.bi.biconfig.standard.AbstractProvisioningTask.execute(AbstractProvisioningTask.java:70)
+        at oracle.as.install.bi.biconfig.standard.StandardProvisionTaskList.execute(StandardProvisionTaskList.java:66)
+        at oracle.as.install.bi.biconfig.BIConfigMain.doExecute(BIConfigMain.java:113)
+        at oracle.as.install.engine.modules.configuration.client.ConfigAction.execute(ConfigAction.java:375)
+        at oracle.as.install.engine.modules.configuration.action.TaskPerformer.run(TaskPerformer.java:88)
+        at oracle.as.install.engine.modules.configuration.action.TaskPerformer.startConfigAction(TaskPerformer.java:105)
+        at oracle.as.install.engine.modules.configuration.action.ActionRequest.perform(ActionRequest.java:15)
+        at oracle.as.install.engine.modules.configuration.action.RequestQueue.perform(RequestQueue.java:96)
+        at oracle.as.install.engine.modules.configuration.standard.StandardConfigActionManager.start(StandardConfigActionManager.java:186)
+        at oracle.as.install.engine.modules.configuration.boot.ConfigurationExtension.kickstart(ConfigurationExtension.java:81)
+        at oracle.as.install.engine.modules.configuration.ConfigurationModule.run(ConfigurationModule.java:86)
+        at java.lang.Thread.run(Thread.java:662)
+
+]]
+
+oracle.as.provisioning.exception.ASProvWorkflowException: /u01/app/oracle/product/11.1.1.7/fmw_1/wlserver_10.3/common/bin/wlst.sh: line 24: 69607 Segmentation fault      (core dumped) "${JAVA_HOME}/bin/java" -Dprod.props.file='/u01/app/oracle/product/11.1.1.7/fmw_1/wlserver_10.3'/.product.properties -Xms128m -Xmx256m weblogic.WLST "$@"

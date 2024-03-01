@@ -1,0 +1,43 @@
+1) Crear Función para elminación de Sesiones (Reemplazar nombre de esquemas)
+	create or replace NONEDITIONABLE PROCEDURE KILL_TESTV_MR0023(p_sid NUMBER, p_serial NUMBER)
+	AS
+    	v_user VARCHAR2(30);
+	BEGIN
+    SELECT MAX(username)
+    INTO v_user
+    FROM v$session
+    WHERE sid = p_sid
+      AND serial# = p_serial;
+
+    IF v_user IN ('TESTV_MR0023') THEN 
+         EXECUTE IMMEDIATE 'ALTER SYSTEM KILL SESSION ''' || p_sid || ',' || p_serial || '''';
+    ELSIF v_user IS NULL THEN
+         RAISE_APPLICATION_ERROR(-20001,'Session has Expired or Invalid sid/serial Arguments Passed');
+    ELSE
+         RAISE_APPLICATION_ERROR(-20002,'Unauthorized Attempt to Kill a Non-Dev Session has been Blocked.');
+    END IF;
+	END KILL_TESTV_MR0023;
+
+
+2)Dar permisos de ejecución al esquema solicitado
+	GRANT EXECUTE ON SYS.KILL_TESTV_MR0023 to TESTV_MR0023;
+
+
+3) Dar permisos para ver Sesiones
+	create role session_role;
+  	  grant select on v_$session to session_role;
+   	    grant session_role to ISSET_CATALOGOS;
+
+
+#############	#############	#############	#############	#############
+
+EN USUARIO
+
+1) Consultar sesiones propias
+	select sid,serial#,username,status,osuser,machine,program
+	from V$SESSION WHERE username = 'TESTV_MR0023'
+	order by machine asc;
+		
+2) Terminar con las sesiones
+		exec SYS.TESTV_MR0023('SID','SERIAL');
+		

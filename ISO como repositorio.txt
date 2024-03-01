@@ -1,0 +1,29 @@
+Crear Direcotrio
+mkdir -p /media/iso
+
+Montar iso ISO Linux
+mount V983339-01.iso /media/iso -o loop
+
+Respaldar archivo de YUM
+cd /etc/yum.repos.d/
+mv /etc/yum.repos.d/oracle-linux-ol7.repo /etc/yum.repos.d/oracle-linux-ol7.repo.bkp
+
+nano oracle-linux-ol7.repo
+Editar archivo de repositorios
+ 
+[InstallMedia]
+name=Repositorio Local de ISO
+baseurl=file:///media/iso
+gpgkey=file:///media/iso/RPM-GPG-KEY-oracle
+gpgcheck=1
+enabled=1
+
+
+Actualizar repositorio
+yum clean all
+
+Listar repositorio
+yum repolist
+
+
+Listo!

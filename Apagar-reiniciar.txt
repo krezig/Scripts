@@ -1,0 +1,13 @@
+
+=Reboot
+shutdown -r now
+shutdown -r 17:00
+init 6
+
+=Shutdown
+shutdown -h now
+shutdown -h 23:30
+init 0
+
+=Cancelar
+shutdown -c

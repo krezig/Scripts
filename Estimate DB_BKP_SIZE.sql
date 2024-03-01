@@ -1,0 +1,1 @@
+expdp system full=yes directory=expdp_dir logfile=full.log ESTIMATE_ONLY=YES

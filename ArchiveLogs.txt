@@ -1,0 +1,70 @@
+Activar Archiving
+SQL> Shutdown immediate
+SQL> Startup mount
+SQL> Alter database archivelog;
+SQL> alter database open;
+
+
+Cambiar destino de Archives
+alter system set log_archive_dest_1='LOCATION=/dbaclass06/arch' scope=both;
+
+
+-Consultar si los archivelogs están activos en SQL
+======
+ARCHIVE LOG LIST;
+======
+
+select log_mode from v$database;
+show parameter recovery_file_dest
+alter database noarchivelog;
+
+1) SQL
+.oraenv
+sqlplus / as sysdba
+
+column deleted format a7
+column reclaimable format a11
+set linesize 120
+select applied,deleted,backup_count
+ ,decode(rectype,11,'YES','NO') reclaimable,count(*)
+ ,to_char(min(completion_time),'dd-mon hh24:mi') first_time
+ ,to_char(max(completion_time),'dd-mon hh24:mi') last_time
+ ,min(sequence#) first_seq,max(sequence#) last_seq
+from gv$archived_log left outer join sys.x$kccagf using(recid)
+where is_recovery_dest_file='YES'
+group by applied,deleted,backup_count,decode(rectype,11,'YES','NO') 
+order by min(sequence#);
+
+alter system set log_archive_dest_1='LOCATION=/disco3/FRA/ADDAX' scope=both;
+
+
+2) RMAN
+rman target /
+
+Listar los archivelogs
+list archivelog all;
+
+list copy of archivelog until time ‘SYSDATE-7';
+==
+list copy of archivelog from time ‘SYSDATE-7';
+==
+
+Eliminar los archivos obsoletos
+delete archivelog all;
+
+Eliminar por periodo de tiempo
+> delete archivelog until time 'SYSDATE-7';
+delete archivelog from time 'SYSDATE-10';
+
+
+-verificar que las fechas de LAST_TIME se encuentren acorde a la eliminación asignada.
+
+select applied Aplicado,creator Usuario, COMPLETION_TIME "DIA REALIZADO",deleted Eliminado
+ ,decode(rectype,11,'YES','NO') Reclamable
+ ,to_char(min(completion_time),'dd-mon hh24:mi') INICIO
+ ,to_char(max(completion_time),'dd-mon hh24:mi') FIN
+ ,min(sequence#) INICIO_seq,max(sequence#) ULTIMA_seq
+from gv$archived_log left outer join sys.x$kccagf using(recid)
+where is_recovery_dest_file='YES'
+group by applied,creator,COMPLETION_TIME,deleted,decode(rectype,11,'YES','NO') 
+order by min(sequence#);

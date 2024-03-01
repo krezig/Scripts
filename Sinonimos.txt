@@ -1,0 +1,3 @@
+grant create public synonym to AGUAST;
+grant create synonym to AGUAST;
+grant create ANY synonym to AGUAST;

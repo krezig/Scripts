@@ -1,0 +1,31 @@
+####################start odb
+
+alter pluggable database <nombre> open;
+
+
+
+#################connecto to pdb
+
+
+SQL> show con_name;
+
+CON_NAME
+------------------------
+CDB$ROOT
+
+SQL> alter session set container = pdborcl1;
+
+Session Altered;
+
+SQL> show con_name;
+
+CON_NAME
+------------------------
+PDBORCL1
+
+
+
+######################## list pdbs
+
+
+show pdbs;

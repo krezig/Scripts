@@ -1,0 +1,200 @@
+-- Crear ACL
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.CREATE_ACL (
+  acl          => 'ACL.xml', 
+  description  => 'Prueba', 
+  principal    => 'ESQUEMA', 
+  is_grant     => TRUE,
+  privilege    => 'connect',
+  start_date   => NULL,
+  end_date     => NULL);
+END;
+/
+
+ 
+ -- Agregar mas esuqemas
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.ADD_PRIVILEGE (
+  acl          => 'network_access_test.xml',
+  principal    => 'TEST_USER_2',
+  is_grant     => TRUE, 
+  privilege    => 'connect',
+  position     => NULL,
+  start_date   => NULL,
+  end_date     => NULL);
+END;
+/
+ 
+ -- Agregar HOST
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.ASSIGN_ACL (
+  acl          => 'network_access_test.xml',
+  host         => '*.yahooapis.com',
+  lower_port   => NULL,
+  upper_port   => NULL); 
+END;
+/
+
+
+--CONSULTAR ACLS
+-- List ACLs
+select *
+from RESOURCE_VIEW
+where any_path like '/sys/acls/%';
+ 
+-- List ACL privileges
+select * from DBA_NETWORK_ACL_PRIVILEGES;
+ 
+-- List URLs
+select * from DBA_NETWORK_ACLS;
+
+
+
+
+-- BORRAR ESQUEMAS 
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.DELETE_PRIVILEGE (
+  acl          => 'network_access_test.xml',
+  principal    => 'TEST_USER',
+  is_grant     => TRUE, 
+  privilege    => 'connect');
+END;
+/
+ 
+-- BORRAR HOSTS
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.UNASSIGN_ACL (
+  acl          => 'network_access_test.xml',
+  host         => '*.yahooapis.com',
+  lower_port   => NULL,
+  upper_port   => NULL); 
+END;
+/
+ 
+-- Dropear ACL
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.DROP_ACL (
+  acl          => 'network_access_test.xml'); 
+END;
+
+
+BEGIN
+DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE(
+  host => '*',
+  ace  =>  xs$ace_type(privilege_list => 
+		       xs$name_list('connect', 'resolve'),
+                       principal_name => 'APEX_180200',
+                       principal_type => xs_acl.ptype_db)); 
+END;
+/
+
+
+dbms_network_acl_admin.append_wallet_ace(
+  wallet_path => 'file:/example/wallets/hr_wallet',
+  ace         =>  xs$ace_type(privilege_list => xs$name_list('use_client_certificates', 'use_passwords'),
+                              principal_name => 'scott',
+                              principal_type => xs_acl.ptype_db));
+
+
+
+========================================================
+begin
+DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE
+      (HOST=>'*',
+       ace=> SYS.XS$ACE_TYPE(privilege_list=>sys.XS$NAME_LIST('JDWP') ,
+                          principal_name=>'RECAUDADOR',
+                          principal_type=>sys.XS_ACL.PTYPE_DB) );
+end;
+/
+
+
+grant execute on DBMS_DEBUG_JDWP to TRECA;
+grant debug any procedure to TRECA;
+grant debug connect session to TRECA;
+
+commit;
+========================================================
+DECLARE
+  ACL_PATH  VARCHAR2(4000);
+BEGIN
+  -- Look for the ACL currently assigned to '*' and give APEX_050100
+  -- the "connect" privilege if APEX_050100 does not have the privilege yet.
+  BEGIN
+      SELECT ACL INTO ACL_PATH FROM DBA_NETWORK_ACLS WHERE HOST = '*' AND LOWER_PORT IS NULL AND UPPER_PORT IS NULL;
+
+    EXCEPTION
+         -- When no ACL has been assigned to '*'.
+            WHEN NO_DATA_FOUND THEN
+              DBMS_NETWORK_ACL_ADMIN.CREATE_ACL('ACL.xml',
+             'ACL that lets power users to connect to everywhere',
+             'APEX_180200', TRUE, 'connect');
+             DBMS_NETWORK_ACL_ADMIN.ASSIGN_ACL('ACL.xml','*');
+  END;
+
+  IF DBMS_NETWORK_ACL_ADMIN.CHECK_PRIVILEGE(ACL_PATH, 'APEX_180200',
+     'connect') IS NULL THEN
+      DBMS_NETWORK_ACL_ADMIN.ADD_PRIVILEGE(ACL_PATH,
+     'APEX_180200', TRUE, 'connect');
+  END IF;
+END;
+/
+COMMIT;
+
+========================================================
+PBR
+select * from DBA_NETWORK_ACL_PRIVILEGES;
+ 
+-- List URLs
+select * from DBA_NETWORK_ACLS;
+
+BEGIN
+   DBMS_NETWORK_ACL_ADMIN.create_acl (
+    acl          => 'ACL_PBR.xml',
+    description  => 'Access List para aplicaciones de PBR ',
+    principal    => 'PBR',
+    is_grant     => TRUE,
+    privilege    => 'connect');
+   COMMIT;
+END;
+
+
+BEGIN
+   DBMS_NETWORK_ACL_ADMIN.ASSIGN_ACL (
+    acl          => 'ACL_PBR.xml',                
+    host         => '*',
+    lower_port   => 25,
+    upper_port   => 587);
+   COMMIT;
+END;
+
+
+COMMIT;
+
+
+
+REPORT PRINTING
+DECLARE
+  ACL_PATH  VARCHAR2(4000);
+BEGIN
+  -- Look for the ACL currently assigned to '*' and give APEX_050100
+  -- the "connect" privilege if APEX_050100 does not have the privilege yet.
+  BEGIN
+      SELECT ACL INTO ACL_PATH FROM DBA_NETWORK_ACLS WHERE HOST = '*' AND LOWER_PORT IS NULL AND UPPER_PORT IS NULL;
+
+    EXCEPTION
+         -- When no ACL has been assigned to '*'.
+            WHEN NO_DATA_FOUND THEN
+              DBMS_NETWORK_ACL_ADMIN.CREATE_ACL('power_users.xml',
+             'ACL that lets power users to connect to everywhere',
+             'APEX_180200', TRUE, 'connect');
+             DBMS_NETWORK_ACL_ADMIN.ASSIGN_ACL('power_users.xml','*');
+  END;
+
+  IF DBMS_NETWORK_ACL_ADMIN.CHECK_PRIVILEGE(ACL_PATH, 'APEX_180200',
+     'connect') IS NULL THEN
+      DBMS_NETWORK_ACL_ADMIN.ADD_PRIVILEGE(ACL_PATH,
+     'APEX_180200', TRUE, 'connect');
+  END IF;
+END;
+/
+COMMIT;

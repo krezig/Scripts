@@ -1,0 +1,79 @@
+###########  EXPORT
+expdp system schemas=RECAUDADOR,RELOG_RECAUDADOR,OBLI_RECAUDADOR  directory=expdp_dir dumpfile=expDEV_MR0024_2.dmp logfile=expDEV_MR0024_2.log consistent=y
+expdp system ESTIMATE_ONLY=YES
+
+expdp system schemas=AGUASP directory=expdp_dir dumpfile=AGUASP_20200217.dmp logfile=expAGUASP_20200217.log consistent=y ESTIMATE_ONLY=YES
+expdp system schemas=RECAUDADOR,RELOG_RECAUDADOR,OBLI_RECAUDADOR directory=expdp_dir dumpfile=SARDGO-1353_20190704.dmp logfile=expSARDGO-1353_20190704.log
+expdp system schemas=RECAUDADOR,OBLI_RECAUDADOR,RELOG_RECAUDADOR directory=expdp_asmdir dumpfile=MDR-947_%U.dmp filesize=10G consistent=y logfile=expdp_dir:expMDR-947.log parallel=6
+
+expdp system schemas=RECAUDADOR,OBLI_RECAUDADOR,RELOG_RECAUDADOR directory=expdp_asmdir dumpfile=MDR-947_%U.dmp filesize=10G logfile=expMDR-947.log parallel=6
+
+expdp system schemas=RECAUDADOR,OBLI_RECAUDADOR,RELOG_RECAUDADOR directory=expdp_asmdir logfile=expMDR-947.log estimate_only=YES
+expdp system schemas=RECAUDADOR,OBLI_RECAUDADOR,RELOG_RECAUDADOR directory=expdp_dir logfile=expMDR-947.log estimate_only=YES
+
+###############
+Include Tables
+expdp system parfile=olapUNA.par
+
+schemas=OLAP
+directory=EXPDP_DIR
+dumpfile=olap.dmp
+logfile=olap1.log
+INCLUDE=TABLE:"IN ('TGC_APORTACIONES_1992_2015','TGC_APORTACIONES','TGC_SUELDO_ASEGURADOS')"
+###############
+impdp system parfile=olapUNA.par
+
+
+
+###########  IMPORT
+impdp system schemas=DEV_MR0024_2  directory=expdp_dir dumpfile=expDEV_MR0024_2.dmp transform=oid:n logfile=impDEV_FD0006.log remap_schema=DEV_MR0024_2:DEV_FD0006
+
+impdp system directory=expdp_dir dumpfile=TRECA_DN0016_2_20191017.dmp transform=oid:n logfile=impTRECA_DN0016_2.log remap_schema=TRECA_DN0016_2:DEV_MR0024
+
+impdp system schemas=AGUASP  directory=EXPDP_DIR dumpfile=AGUASP_20201204.dmp logfile=IMP_AGUASP_20201204.dmp transform=oid:n parallel=3 remap_schema=AGUASP:AGUAST
+
+
+	expdp>kill_job
+
+
+==TABASCO
+impdp system schemas=RECAUDADOR,OBLI_RECAUDADOR,RELOG_RECAUDADOR,FACTURACION directory=expdp_dir dumpfile=expCR0010-4251.dmp logfile=impCR0010-4251.log transform=oid:n remap_schema=RECAUDADOR:RECAUDADOR_CAP,RELOG_RECAUDADOR:RELOG_RECAUDADOR_CAP,OBLI_RECAUDADOR:OBLI_RECAUDADOR_CAP,FACTURACION:FACTURACION_CAP
+remap_schema=RECAUDADOR:RECAUDADOR_ENMASCARA,OBLI_RECAUDADOR:OBLI_RECAUDADOR_ENMASCARA,RELOG_RECAUDADOR:RELOG_RECAUDADOR_ENMASCARA,FACTURACION:FACTURACION_ENMASCARA
+impdp system schemas=RECAUDADOR,OBLI_RECAUDADOR,RELOG_RECAUDADOR,FACTURACION directory=expdp_dir dumpfile=CR0010-1917.dmp parallel=2 logfile=RECAUDADOR.log transform=oid:n 
+
+===APEC
+impdp system schemas=APEC directory=DATA_PUMP_DIR dumpfile=BKP_APEC_EXPDP.dmp parallel=2 logfile=IMP_APEC.log transform=oid:n 
+remap_schema=RECAUDADOR:RECAUDADOR2,RELOG_RECAUDADOR:RELOG_RECAUDADOR2,OBLI_RECAUDADOR:OBLI_RECAUDADOR2
+
+
+=EXPDP_DIR
+create or replace directory EXPDP_DIR as '/u02/exports';
+select * from dba_directories;
+select * from dba_directories where directory_name ='EXPDP_DIR';
+
+GRANT READ,WRITE ON DIRECTORY ADJUNTOS TO APEX_180200;
+
+
+=TAMAÑO ESQUEMAS
+select owner,trunc(sum(bytes)/1024/1024/1024) GB from dba_segments
+where owner in ('RECAUDADOR', 'INTEGRACION', 'OBLI_RECAUDADOR', 'RELOG_RECAUDADOR')
+group by owner
+having sum(bytes) >0
+order by 2;
+
+=ESQUEMAS CREADOS
+SELECT USERNAME, ACCOUNT_STATUS, CREATED
+FROM DBA_USERS 
+where USERNAME in ('RECAUDADOR', 'INTEGRACION', 'OBLI_RECAUDADOR', 'RELOG_RECAUDADOR');
+
+==DATA PUMP JOBS
+SELECT * FROM dba_datapump_jobs;
+SELECT   w.sid, w.event, w.seconds_in_wait FROM   V$SESSION s, DBA_DATAPUMP_SESSIONS d, V$SESSION_WAIT w WHERE   s.saddr = d.saddr AND s.sid = w.sid;
+SELECT name, sql_text, error_msg from dba_resumable;
+
+==Terminar job
+select * from dba_datapump_jobs;
+
+expdp system/passwd attach='SYS_EXPORT_SCHEMA_01'
+status - stop_job - start_jop - kill_job
+yes

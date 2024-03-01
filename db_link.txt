@@ -1,0 +1,57 @@
+############	Método 1    ############
+
+Desde SQLdeveloper Workaround Con string completa
+
+CREATE PUBLIC DATABASE LINK dbl_bd001
+CONNECT TO repadmin IDENTIFIED BY reppass1
+USING '(description = 
+(address = 
+(protocol = tcp)
+(host = recadb.spf.com)
+(Port = 1521) )
+(connect_data = 
+(sid = bd001) )
+)';
+
+############	Método 2    ############
+1) Crear Entrada en TNSNAMES.ora y HOSTS
+============================
+nano /u01/app/oracle/product/12.2.0/db_1/network/admin/tnsnames.ora
+
+DB =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.6.49)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = medb.isset.gob.mx)
+    )
+  )
+============================
+nano /etc/hosts
+10.14.3.26	recadb.spf.tabasco.local
+============================
+
+
+2) --Crear DB Link
+
+CREATE DATABASE LINK CAP_LINK
+CONNECT TO remote_user IDENTIFIED BY password
+USING 'DB';
+
+
+--Probar db_Link
+select dummy "Prueba DB-LINK" from dual@FINANCIERO.SPF.TABASCO.LOCAL;
+
+
+--dblinks Creados
+select * from DBA_DB_LINKS;
+
+
+--Borrar dblibk
+drop public database link "FINANCIERO.SPF.TABASCO.LOCAL";
+
+--Permisos DBLINK
+GRANT CREATE DATABASE LINK TO RECAUDADOR;
+GRANT CREATE PUBLIC DATABASE LINK TO RECAUDADOR;
+COMMIT;
+

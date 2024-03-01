@@ -1,0 +1,49 @@
+1) Crear Profile
+
+CREATE PROFILE "RECPROFILE"
+LIMIT
+    COMPOSITE_LIMIT UNLIMITED
+    SESSIONS_PER_USER UNLIMITED
+    CPU_PER_SESSION UNLIMITED
+    CPU_PER_CALL UNLIMITED
+    LOGICAL_READS_PER_SESSION UNLIMITED
+    LOGICAL_READS_PER_CALL UNLIMITED
+    IDLE_TIME UNLIMITED
+    CONNECT_TIME UNLIMITED
+    PRIVATE_SGA UNLIMITED
+    FAILED_LOGIN_ATTEMPTS UNLIMITED
+    PASSWORD_LIFE_TIME UNLIMITED
+    PASSWORD_REUSE_TIME UNLIMITED
+    PASSWORD_REUSE_MAX UNLIMITED
+    PASSWORD_VERIFY_FUNCTION NULL
+    PASSWORD_LOCK_TIME 1
+    PASSWORD_GRACE_TIME 7;
+
+2) ENCONTRAR ESQUEMAS CANDIDATOS A ALTERAR
+
+--Usuarios Bloqueados o Expirados
+SELECT username,profile, account_status, created, expiry_date, profile, 'ALTER USER ' ||username|| ' IDENTIFIED BY "contraseña" ACCOUNT UNLOCK;' "New_Pass", 'ALTER USER '||username||' PROFILE recprofile;' "New_Profile"
+from DBA_USERS 
+where account_status != 'OPEN'
+order by username asc;
+
+--Usuario que está o pronto estará expirado
+	set lines 99
+	select username, created, account_status, EXPIRY_DATE
+	FROM dba_users
+	where expiry_date IS NOT NULL
+	ORDER BY 2 DESC;
+
+
+
+3) ASIGNAR PERFIL A ESQUEMA
+
+ALTER USER RECAUDADOR PROFILE recprofile;
+
+===============
+VALORES ESPECIFICOS
+select profile from DBA_USERS where username = 'RECPROFILE';
+
+alter profile DEFAULT limit password_life_time UNLIMITED;
+
+select resource_name,limit from dba_profiles where profile='DEFAULT';

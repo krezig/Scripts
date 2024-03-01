@@ -1,0 +1,44 @@
+Encontrar Datos de DB
+
+HOSTNAME
+SELECT host_name FROM v$instance;
+
+IP
+SELECT UTL_INADDR.get_host_address IP from dual;
+
+SERVICE NAME
+select value "Service name" from v$parameter where name like '%service_name%';
+
+SID
+select name AS "SID" from v$database;
+
+NOMBRE BASE DE DATOS
+SELECT GLOBAL_NAME AS "DB_NAME" FROM GLOBAL_NAME;
+
+VERSION
+SELECT BANNER_FULL FROM V$VERSION;
+
+ORACLE_HOME
+select SYS_CONTEXT ('USERENV','ORACLE_HOME') from dual;
+
+CHARACTERSET
+SELECT * FROM NLS_DATABASE_PARAMETERS WHERE parameter = 'NLS_CHARACTERSET';
+
+PESO BASE DE DATOS
+select "Reservado(GB)", "Reservado(GB)" - "Disponible(GB)" "Utilizado(GB)","Disponible(GB)"
+from (select(select round(sum(bytes/(1014*1024)/1024),0) from dba_data_files) "Reservado(GB)",
+(select round(sum(bytes/(1024*1024)/1024),0) from dba_free_space) "Disponible(GB)"
+from dual);
+
+USUARIO ACTUAL
+SELECT sys_context('USERENV','SESSION_USER') as "USER NAME", sys_context('USERENV', 'CURRENT_SCHEMA') as "CURRENT SCHEMA" FROM dual;
+
+DIAGNOSTICS Y TUNNING PACK
+show parameter CONTROL_MANAGEMENT_PACK_ACCESS;
+
+HORA DE BASE DE DATOS
+select to_char(sysdate,'dd/mm/yyyy hh24:mi:ss') "Hora Actual" from dual;
+
+TIEMPO ACTIVA
+select instance_name "Instancia",to_char(startup_time,'dd/mm/yyyy hh24:mi:ss') as "Iniciada el, a las:"from v$instance;
+

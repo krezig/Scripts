@@ -1,0 +1,17 @@
+1) Mostrar ID de base de datos actual
+show con_id
+
+2) Propiedades del CDB
+ select * from CDB_PROPERTIES;
+
+3) Mostrar nombres de las PDB
+
+ SELECT name, pdb
+FROM   v$services
+ORDER BY name;
+
+alter system set sessions=1500 scope=spfile; 
+alter system set processes=3000 scope=spfile; 
+
+2) Conectar a pluggable 
+ALTER SESSION SET CONTAINER = TEBDDBCDB;

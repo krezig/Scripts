@@ -1,0 +1,107 @@
+Truncating a Materialized View Log
+If a materialized view log grows and allocates many extents, then purging the log of rows does not reduce the amount of space allocated for the log. In such cases, you should truncate the materialized view log. Only the owner of a materialized view log or a user with the DELETE ANY TABLE system privilege can truncate a materialized view log.
+
+To reduce the space allocated for a materialized view log by truncating it, complete the following steps:
+
+Step 1   Acquire an exclusive lock on the master table or master materialized view to prevent updates during the following process.
+For example, issue a statement similar to the following:
+
+LOCK TABLE hr.employees IN EXCLUSIVE MODE;
+Step 2   Using a second database session, copy the rows in the materialized view log (in other words, the MLOG$ table) to a temporary table.
+For example, issue a statement similar to the following:
+
+CREATE TABLE hr.templog AS SELECT * FROM hr.MLOG$_employees;
+Step 3   Using the second session, truncate the log using the SQL statement TRUNCATE TABLE.
+For example, issue a statement similar to the following:
+
+TRUNCATE TABLE hr.MLOG$_employees;
+Step 4   Using the second session, reinsert the old rows.
+Perform this step so that you do not have to perform a complete refresh of the dependent materialized views.
+
+For example, issue statements similar to the following:
+
+INSERT INTO hr.MLOG$_employees SELECT * FROM hr.templog;
+
+DROP TABLE hr.templog;
+Step 5   Using the first session, release the exclusive lock on the master table or master materialized view.
+You can accomplish this by performing a rollback:
+
+ROLLBACK;
+
+
+
+alter tablespace APPS_TS_SUMMARY coalesce;
+
+
+BEGIN
+   DBMS_MVIEW.PURGE_LOG (
+      master => 'AP.AP_SUPPLIER_SITES_ALL',
+      num    => 1,
+      flag   => 'DELETE');
+END;
+/
+
+
+
+
+select * from dba_objects where object_name ='MLOG$_AP_SUPPLIER_SITES_AL';
+
+select * from dba_objects where object_name like '%AP_SUPPLIER_SITES_AL%';
+
+select * from dba_tables where tablespace_name='APPS_TS_SUMMARY' and table_name='MLOG$_AP_SUPPLIER_SITES_AL';
+
+select * from dba_tables where tablespace_name='APPS_TS_SUMMARY';
+
+SELECT COUNT(1) FROM AP.MLOG$_AP_SUPPLIER_SITES_AL;
+
+SELECT owner, segment_name table_name,  sum (bytes)/1024/1024 as MB FROM dba_segments WHERE owner = 'AP' AND segment_name ='MLOG$_AP_SUPPLIER_SITES_AL' GROUP BY  owner, segment_name
+
+
+col "Tablespace" for a22
+col "Used MB" for 99,999,999
+col "Free MB" for 99,999,999
+col "Total MB" for 99,999,999
+
+select df.tablespace_name "Tablespace",
+totalusedspace "Used MB",
+(df.totalspace - tu.totalusedspace) "Free MB",
+df.totalspace "Total MB",
+round(100 * ( (df.totalspace - tu.totalusedspace)/ df.totalspace))
+"Pct. Free"
+from
+(select tablespace_name,
+round(sum(bytes) / 1048576) TotalSpace
+from dba_data_files
+group by tablespace_name) df,
+(select round(sum(bytes)/(1024*1024)) totalusedspace, tablespace_name
+from dba_segments
+group by tablespace_name) tu
+where df.tablespace_name = tu.tablespace_name ;
+
+
+
+SELECT tablespace_name,
+       size_mb,
+       free_mb,
+       max_size_mb,
+       max_free_mb,
+       TRUNC((max_free_mb/max_size_mb) * 100) AS free_pct,
+       RPAD(' '|| RPAD('X',ROUND((max_size_mb-max_free_mb)/max_size_mb*10,0), 'X'),11,'-') AS used_pct
+FROM   (
+        SELECT a.tablespace_name,
+               b.size_mb,
+               a.free_mb,
+               b.max_size_mb,
+               a.free_mb + (b.max_size_mb - b.size_mb) AS max_free_mb
+        FROM   (SELECT tablespace_name,
+                       TRUNC(SUM(bytes)/1024/1024) AS free_mb
+                FROM   dba_free_space
+                GROUP BY tablespace_name) a,
+               (SELECT tablespace_name,
+                       TRUNC(SUM(bytes)/1024/1024) AS size_mb,
+                       TRUNC(SUM(GREATEST(bytes,maxbytes))/1024/1024) AS max_size_mb
+                FROM   dba_data_files
+                GROUP BY tablespace_name) b
+        WHERE  a.tablespace_name = b.tablespace_name
+       )
+ORDER BY tablespace_name;

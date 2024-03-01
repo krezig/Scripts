@@ -1,0 +1,57 @@
+--Reemplazar usuario
+select usuario from dual where dummy = &&usuario;
+
+CREATE USER ISSET identified by isset4u account unlock;
+
+grant connect, create session to &usuario;
+
+grant create any view to &usuario;
+
+grant create any table to &usuario;
+
+grant create any procedure to &usuario;
+
+grant create any view to &usuario;
+
+grant create any trigger to &usuario;
+
+grant create any type to &usuario;
+
+grant CREATE ANY SEQUENCE TO &usuario;
+
+grant EXECUTE ON UTL_HTTP to &usuario;
+
+grant EXECUTE ON UTL_SMTP to &usuario;
+
+ALTER USER &usuario quota unlimited On users;
+
+--Debbug
+begin
+DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE
+      (HOST=>'*',
+       ace=> SYS.XS$ACE_TYPE(privilege_list=>sys.XS$NAME_LIST('JDWP') ,
+                          principal_name=>'RECAUDADOR',
+                          principal_type=>sys.XS_ACL.PTYPE_DB) );
+end;
+/
+
+grant execute on DBMS_DEBUG_JDWP to &usuario;
+grant debug any procedure to &usuario;
+grant debug connect session to &usuario;
+
+
+
+--ACL
+select * from DBA_NETWORK_ACL_PRIVILEGES;
+select * from DBA_NETWORK_ACLS;
+
+
+BEGIN
+  DBMS_NETWORK_ACL_ADMIN.ADD_PRIVILEGE(
+    acl => 'ACL.xml', 
+    principal => '&usuario', 
+    is_grant => TRUE, 
+    privilege => 'connect');
+END;
+
+commit;

@@ -1,0 +1,32 @@
+SGA
+--Utilización
+SELECT ROUND (used.bytes / 1024 / 1024, 2) "SGA_usado",
+       ROUND (free.bytes / 1024 / 1024, 2) "SGA_libre",
+       ROUND (tot.bytes / 1024 / 1024, 2)  "SGA_total"
+  FROM (SELECT SUM (bytes) bytes
+          FROM v$sgastat
+         WHERE name != 'free memory') used,
+       (SELECT SUM (bytes) bytes
+          FROM v$sgastat
+         WHERE name = 'free memory') free,
+       (SELECT SUM (bytes) bytes FROM v$sgastat) tot;
+
+--Incrementar
+alter system set memory_max_target=8096m scope=spfile;
+alter system set memory_target=8096m scope=spfile;
+
+
+
+
+
+PGA
+--Utilización
+show parameter pga_aggregate_limit;
+--Incrementar
+ALTER SYSTEM SET pga_aggregate_limit=6G SCOPE=BOTH;
+
+
+
+--Parámetros
+alter system set processes=2000 scope=spfile; 
+alter system set sessions=1222 scope=spfile; 

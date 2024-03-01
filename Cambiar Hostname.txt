@@ -1,0 +1,41 @@
+V6
+hostname wls01.localdomain
+
+V7
+hostnamectl set-hostname wls01.localdomain
+
+CAMBIAR A HOSTNAME NUEVO
+hostnamectl me.isset.gob.mx
+hostname me.isset.gob.mx
+
+EDITAR ENTRADA EN SO
+nano /etc/sysconfig/network
+	HOSTNAME=me.isset.gob.mx
+
+Como usuario ORACLE editar los siguientes archivos del dominio
+/u01/app/oracle/product/12.2.1/fmw_1/inventory/registry.xml
+/u01/app/oracle/product/12.2.1/fmw_1/user_projects/domains/base_domain/config/config.xml
+/u01/app/oracle/product/12.2.1/fmw_1/user_projects/domains/base_domain/init-info/tokenValue.properties
+/u01/app/oracle/product/12.2.1.4/fmw_1/utils/ccr/domainlocation.properties
+/u01/app/oracle/product/12.2.1.4/fmw_1/user_projects/domains/base_domain/init-info/nodemanager-properties.xml
+/u01/app/oracle/product/12.2.1.4/fmw_1/user_projects/domains/base_domain/nodemanager/nodemanager.properties
+/u01/app/oracle/product/12.2.1.4/fmw_1/user_projects/domains/base_domain/security/DemoIdentity.jks
+/u01/app/oracle/product/12.2.1.4/fmw_1/user_projects/domains/base_domain/init-info/startscript.xml
+
+/bin/scripts
+Sart - Stop
+
+/etc/hosts
+
+CAMBIAR IP
+nano /etc/sysconfig/network
+nano /etc/sysconfig/network-scripts/ifcfg-eth0
+nano /etc/hosts
+nano /etc/resolv.conf
+nano /etc/sysconfig/network-scripts
+
+ifdown eth0
+ifup eth0
+
+
+

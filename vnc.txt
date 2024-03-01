@@ -1,0 +1,30 @@
+OL8
+yum install tigervnc-server
+cp /lib/systemd/system/vncserver@.service /etc/systemd/system
+nano /etc/tigervnc/vncserver.users
+:1=oracle
+:2=root
+vncpasswd
+vncserver
+
+systemctl start vncserver@:1
+systemctl enable vncserver@:1
+
+OL7
+cp /lib/systemd/system/vncserver@.service /etc/systemd/system
+cd /etc/systemd/system
+mv vncserver@.service vncserver@:1.service
+nano vncserver@\:1.service
+USER=oracle
+vncpasswd
+vncserver
+
+
+
+OL6
+nano /etc/sysconfig/vncservers
+VNCSERVERS="1:root"
+VNCSERVERARGS[1]="-geometry 1280x1024 -nolisten tcp -localhost"
+
+chkconfig vncserver on
+service vncserver start

@@ -1,0 +1,91 @@
+
+1.- Consultar Flash backs
+
+SET LINESIZE 150
+
+COLUMN flashback_archive_name FORMAT A22
+COLUMN tablespace_name FORMAT A20
+COLUMN quota_in_mb FORMAT A11
+
+SELECT flashback_archive_name,
+       flashback_archive#,
+       tablespace_name,
+       quota_in_mb
+FROM   dba_flashback_archive_ts
+ORDER BY flashback_archive_name;
+
+	SELECT * FROM DBA_FLASHBACK_ARCHIVE;
+
+
+===== Crear Flash Back
+
+CREATE TABLESPACE fda_dev_pbr DATAFILE '/u02/oradata/MEDDB/fba.dbf' SIZE 128M AUTOEXTEND ON NEXT 4M maxsize unlimited;
+
+ALTER USER PBR QUOTA UNLIMITED ON fda_dev_pbr;
+
+CREATE FLASHBACK ARCHIVE DEFAULT fda_3year TABLESPACE fda_dev_pbr QUOTA 10G RETENTION 3 YEAR;
+
+GRANT FLASHBACK ARCHIVE ON fda_3year TO PBR;
+
+GRANT FLASHBACK ARCHIVE ADMINISTER TO PBR;
+
+GRANT EXECUTE ON DBMS_FLASHBACK_ARCHIVE TO PBR;
+
+GRANT CREATE ANY CONTEXT TO PBR;
+
+EXEC DBMS_FLASHBACK_ARCHIVE.set_context_level('ALL');
+
+
+
+=====Permisos
+--Crear Aplicacion para FDA
+BEGIN
+DBMS_FLASHBACK_ARCHIVE.register_application(
+application_name => 'PBR_APP',
+flashback_archive_name => 'fda_3year');
+END;
+/
+
+--Agregar Tablas
+BEGIN
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'AA_PARAMETRO', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_BENEFICIARIOS', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_ESTRUCTURA', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_INDICADOR', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_INDICADOR_PROGRAMA', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_INDICADOR_COMPONENTE', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_INDICADOR_ACTIVIDAD', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_VARIABLE', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_MIR', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_MIR_PLAN', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_COMPONENTE', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_ACTIVIDAD', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_POA', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_POA_ACTI_INST', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_POA_ACTI_META', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PP_ANTEPROYECTO', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PP_ANTEPROYECTO_LINEA', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PP_CALENDARIZACION', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PP_MOV_PRESUPUESTAL', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PP_PRESUPUESTO', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PP_VALI_UNID_RESP_ANTE', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_MIR_PLAN_ACTIVIDAD', schema_name => 'PBR');
+DBMS_FLASHBACK_ARCHIVE.add_table_to_application(application_name => 'PBR_APP', table_name => 'PB_MIR_PLAN_COMPONENTE', schema_name => 'PBR');
+END;
+/
+
+--Activar Historico(FDA)
+BEGIN
+DBMS_FLASHBACK_ARCHIVE.enable_application(
+application_name => 'PBR_APP');
+END;
+/
+
+
+--Borrar FlashBack
+DROP FLASHBACK ARCHIVE fda_dev_pbr;
+
+--Desahbilitar
+select TABLE_NAME,OWNER_NAME,FLASHBACK_ARCHIVE_NAME,STATUS, 'alter table '||OWNER_NAME ||'.'||TABLE_NAME ||' no flashback archive;' as "Desahbilitar" 
+from DBA_FLASHBACK_ARCHIVE_TABLES 
+where OWNER_NAME=upper('MODULOS');

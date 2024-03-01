@@ -1,0 +1,104 @@
+### Crear
+
+CREATE TABLESPACE REC3_MDS DATAFILE '/u02/oradata/DEV/apex_01.dbf' SIZE 64M AUTOEXTEND ON NEXT 4M maxsize unlimited;
+
+Select df.tablespace_name "Tablespace", totalusedspace "MB Utilizados", (df.totalspace - tu.totalusedspace) "Libre", df.totalspace "Total MB", round(100 * ( (df.totalspace - tu.totalusedspace)/ df.totalspace)) "% Libre" from (select tablespace_name, round(sum(bytes) / 1048576) TotalSpace from dba_data_files group by tablespace_name) df, (select round(sum(bytes)/(1024*1024)) totalusedspace, tablespace_name from dba_segments group by tablespace_name) tu where df.tablespace_name = tu.tablespace_name ;
+alter database datafile '/u02/oradata/treca/TRECA/datafile/o1_mf_sysaux_h45ogd27_.dbf' resize 3200M;
+ALTER TABLESPACE undotbs_01 ADD DATAFILE '/u02/oradata/tdbdue/undotbs02.dbf' size 100M AUTOEXTEND ON NEXT 4M MAXSIZE UNLIMITED;
+
+alter tablespace temp add tempfile '/u02/oradata/tdbdue/undotbs02.dbf' size 1024m autoextend on next 10m maxsize UNLIMITED;
+
+select tablespace_name, round(sum(bytes)/1024/1024, 2) as free_space from dba_free_space group by tablespace_name;
+
+
+### Hacer Extendible
+select file_name, autoextensible from dba_data_files;
+alter database datafile '/u02/app/oracle/oradata/temp01.dbf' AUTOEXTEND ON;
+alter database tempfile '/u02/app/oracle/oradata/temp01.dbf' AUTOEXTEND ON;
+
+
+###TEMP
+alter tablespace temp add tempfile '/u02/oradata/tdbdue/undotbs02.dbf' size 1024m autoextend on next 10m maxsize UNLIMITED;
+
+
+###ASMM
+ALTER TABLESPACE APPS_TS_SUMMARY ADD DATAFILE '+DATAC1' SIZE 512M AUTOEXTEND ON NEXT 4m MAXSIZE unlimited;
+ALTER TABLESPACE TEMP2 ADD TEMPFILE '+DATAC1' SIZE 512M AUTOEXTEND ON NEXT 4m MAXSIZE unlimited;
+SELECT name Diskgroup, free_mb Libre, total_mb Total, total_mb - free_mb, round(free_mb/total_mb*100,0) || '%' as "% Libre" FROM v$asm_diskgroup;
+
+
+###Query DF
+select tablespace_name,file_name,bytes/1024/1024/1024 from dba_data_files;
+
+
+###Table space FULL
+ALTER TABLESPACE OLAP_TBS ADD DATAFILE '/u02/oradata/obidb/olap_tbs_07.dbf' SIZE 128M AUTOEXTEND ON NEXT 4M maxsize unlimited;
+ALTER USER olap QUOTA UNLIMITED ON OLAP_TBS;
+
+
+###Borrar Tablespace
+DROP TABLESPACE REC2_IAS_TEMP INCLUDING CONTENTS CASCADE CONSTRAINTS; 
+
+
+
+### DATAFILES DE TABLESPACES
+SELECT  substr(A.tablespace_name,1,18) tablespace_name,
+        a.file_name "DataFile",
+       trunc(decode(A.autoextensible,'YES',A.MAXSIZE-A.bytes+b.free,'NO',b.free)/1024/1024) "Libres",
+       trunc(A.MAXSIZE/1024/1024) "Capacidad" ,
+       trunc(a.bytes/1024/1024) "Utilizados",
+       a.autoextensible "AutoExtendibles?"
+FROM (
+     SELECT file_id, file_name,
+            tablespace_name,
+            autoextensible,
+            bytes,
+            decode(autoextensible,'YES',maxbytes,bytes) maxsize
+     FROM   dba_data_files
+     GROUP BY file_id, file_name,
+              tablespace_name,
+              autoextensible,
+              bytes,
+              decode(autoextensible,'YES',maxbytes,bytes)
+     ) a,
+     (SELECT file_id,
+             tablespace_name,
+             sum(bytes) free
+      FROM   dba_free_space
+      GROUP BY file_id,
+               tablespace_name
+      ) b
+WHERE a.file_id=b.file_id(+)
+AND A.tablespace_name=b.tablespace_name(+)
+ORDER BY A.tablespace_name ASC; 
+
+
+### Hacer dataFiles extendibles:
+select TABLESPACE_NAME,AUTOEXTENSIBLE,'alter database datafile '|| file_name|| ' '||' autoextend on maxsize unlimited;' "Extender"
+from dba_data_files
+order by 1;
+
+
+### Uso de los Tablespaces
+SELECT d.status "Status", d.tablespace_name "Name", 
+ TO_CHAR(NVL(a.bytes / 1024 / 1024 /1024, 0),'99,999,990.90') "Tamaño  (GB)", 
+ TO_CHAR(NVL(a.bytes - NVL(f.bytes, 0), 0)/1024/1024 /1024,'99999999.99') "Usado (GB)", 
+ TO_CHAR(NVL(f.bytes / 1024 / 1024 /1024, 0),'99,999,990.90') "Disponible (GB)", 
+ TO_CHAR(NVL((a.bytes - NVL(f.bytes, 0)) / a.bytes * 100, 0), '990.00') "(Porcentaje de uso) %"
+ FROM sys.dba_tablespaces d, 
+ (select tablespace_name, sum(bytes) bytes from dba_data_files group by tablespace_name) a, 
+ (select tablespace_name, sum(bytes) bytes from dba_free_space group by tablespace_name) f WHERE 
+ d.tablespace_name = a.tablespace_name(+) AND d.tablespace_name = f.tablespace_name(+) AND NOT 
+ (d.extent_management like 'LOCAL' AND d.contents like 'TEMPORARY') 
+UNION ALL 
+SELECT d.status 
+ "Status", d.tablespace_name "Name", 
+ TO_CHAR(NVL(a.bytes / 1024 / 1024 /1024, 0),'99,999,990.90') "Tamaño (GB)", 
+ TO_CHAR(NVL(t.bytes,0)/1024/1024 /1024,'99999999.99') "Usado (GB)",
+ TO_CHAR(NVL((a.bytes -NVL(t.bytes, 0)) / 1024 / 1024 /1024, 0),'99,999,990.90') "Disponible (GB)", 
+ TO_CHAR(NVL(t.bytes / a.bytes * 100, 0), '990.00') "(Used) %" 
+ FROM sys.dba_tablespaces d, 
+ (select tablespace_name, sum(bytes) bytes from dba_temp_files group by tablespace_name) a, 
+ (select tablespace_name, sum(bytes_cached) bytes from v$temp_extent_pool group by tablespace_name) t 
+ WHERE d.tablespace_name = a.tablespace_name(+) AND d.tablespace_name = t.tablespace_name(+) AND 
+ d.extent_management like 'LOCAL' AND d.contents like 'TEMPORARY'; 

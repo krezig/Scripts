@@ -1,0 +1,55 @@
+
+1) CONSULTAS ENONCTRADAS EN TOP SQL
+	Clic Derecho > Detalles  (Obtener cadena de consulta con alto TOP)
+
+
+2) Encontrar SQL_ID al consultar parte de la Consulta  (INCLUIDA LA CONSULTA MISMA)
+SELECT SQL_ID,executions, first_load_time, application_wait_time, parsing_schema_name,module, cpu_time,SQL_TEXT
+FROM V$SQL
+WHERE lower(SQL_FULLTEXT) LIKE '%re_cajas_transaccion_wrapper.call_grabar_transaccion%';
+				____________STRING______________
+
+3) Encontrar datos de la sesión que Ejecuta/Ejecutó esa consulta
+SELECT sid, serial#, schemaname, status, osuser, machine, program,type
+FROM v$session
+where SQL_ID = '1p885q4w2qsc8';
+
+4) Reportar Las sesiones encontradas
+
+col program form a30 heading "Program" 
+col CPUMins form 99990 heading "CPU in Mins" 
+
+SELECT rownum as rank, a.* 
+from ( SELECT v.sid,sess.serial#, program, round(v.value / (100 * 60),2) CPUMins, sess.machine, sess.status, sess.SQL_ID
+    FROM v$statname s , v$sesstat v, v$session sess 
+    WHERE s.name = 'CPU used by this session' 
+    and sess.sid = v.sid 
+    and v.statistic#=s.statistic# 
+    and v.value>0 
+ORDER BY v.value DESC) a where rownum <11;
+ 
+ 
+ DESC v$sesstat;
+
+select n.schemaname,n.machine, s.sid, s.value, n.status, n.sql_id
+from v$sesstat s, v$statname t, v$session n
+where s.statistic# = t.statistic# and n.sid = s.sid and t.name = 'CPU used by this session'
+order by s.value desc;
+
+SELECT SQL_ID FROM V$SESSION;
+
+SELECT * FROM
+(SELECT
+    parsing_schema_name Esquema,
+    sql_fulltext Consulta,
+    sql_id,
+    elapsed_time,
+    child_number,
+    disk_reads,
+    executions Ejecuciones,
+    first_load_time "Primera Ejecución",
+    last_load_time "Última Ejecución"
+FROM    v$sql
+ORDER BY elapsed_time DESC)
+WHERE ROWNUM < 20
+/

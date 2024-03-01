@@ -1,0 +1,27 @@
+1) ACL
+
+begin
+DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE
+      (HOST=>'*',
+       ace=> SYS.XS$ACE_TYPE(privilege_list=>sys.XS$NAME_LIST('JDWP') ,
+                          principal_name=>'RECAUDADOR',
+                          principal_type=>sys.XS_ACL.PTYPE_DB) );
+end;
+/
+
+2) Grants
+
+grant execute on DBMS_DEBUG_JDWP to RECAUDADOR;
+grant debug any procedure to RECAUDADOR;
+grant debug connect session to RECAUDADOR;
+
+commit;
+
+
+3) Confirmar lista de permisos
+
+-- List ACL privileges
+select * from DBA_NETWORK_ACL_PRIVILEGES;
+ 
+-- List URLs
+select * from DBA_NETWORK_ACLS;

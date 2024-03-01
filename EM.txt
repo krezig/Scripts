@@ -1,0 +1,15 @@
+### Eliminar repositorio de EM
+Como Oracle y variables cargadas
+
+  emca -deconfig dbcontrol db -repos drop
+
+### Crear repositorio de EM
+Como Oracle y variables cargadas
+
+  emca -config dbcontrol db -repos create
+
+### Iniciar EM
+emctl start dbconsole
+
+### Consultar Estatus EM
+emctl status dbconsole

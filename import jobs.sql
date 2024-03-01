@@ -1,0 +1,1 @@
+select l.owner, l.table_name, l.segment_name, s.bytes from dba_lobs l, dba_segments s where  l.table_name like 'SYS_IMPORT_FULL%' and l.table_name = s.segment_name;

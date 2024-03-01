@@ -1,0 +1,36 @@
+=== TAMAÑO DE UN ESQUEMA
+SELECT OWNER ESQUEMA, ROUND(sum(bytes)/1024/1024/1024,3) "Peso en GB"
+from dba_segments group by owner
+having owner = UPPER('RECAUDADOR'); 
+
+=== TAMAÑO DE TODOS LOS ESQUEMAS
+select owner Esquema, Round(sum(bytes)/1024/1024/1024,3) "Peso en GB"
+from dba_segments 
+group by owner
+order by 2 desc;
+
+=== TAMAÑO DE INFORMACION EN TODA LA BASE DE DATOS
+SELECT ROUND(sum(bytes)/1024/1024/1024,3) "Peso Total de Datos"
+from dba_segments; 
+
+=== TAMAÑO DE TODAS LAS TABLAS
+select owner, table_name, round((num_rows*avg_row_len)/(1024*1024)) MB 
+from all_tables 
+where owner not like 'SYS%' 
+and num_rows > 0 
+order by MB desc;
+
+=== TAMAÑO DE TODAS LAS TABLAS DE UN ESQUEMA
+select owner, table_name, round((num_rows*avg_row_len)/(1024*1024)) MB 
+from all_tables 
+where owner = 'OLAP'
+and num_rows > 0 
+order by MB desc;
+
+=== TABLESPACES USADOS POR ESQUEMA
+select distinct tablespace_name "Tablespace",round((sum(bytes)/(1024*1024)/1024),3) GB_USADOS, 
+'alter tablespace ' ||tablespace_name || ' ADD DATAFILE /u02/oradata/treccuu01/rec_cajas_ind_02.dbf SIZE 56M AUTOEXTEND ON NEXT 4M MAXSIZE UNLIMITED;' "Crear TSP"
+from dba_segments
+where owner IN ('DATOS_BATIDOS')
+group by tablespace_name
+ORDER BY GB_USADOS DESC;

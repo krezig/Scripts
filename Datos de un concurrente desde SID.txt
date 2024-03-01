@@ -1,0 +1,23 @@
+select c.request_id, status_code, phase_code, USER_CONCURRENT_PROGRAM_NAME,d.user_name requestor, s.sid,p.spid,s.process,s.osuser
+from v$session s, v$process p, apps.fnd_concurrent_requests c,apps.fnd_concurrent_programs_tl ct, apps.fnd_user d
+where oracle_process_id=p.spid
+and s.paddr=p.addr and
+ct.concurrent_program_id=c.concurrent_program_id
+and c.requested_by = d.user_id
+and s.sid = ‘&enter_sid’;
+
+
+SELECT fcr.request_id,vsq.sql_id,
+fcp.user_concurrent_program_name,
+vsq.sql_text
+
+FROM fnd_concurrent_requests fcr,
+v$process vp,
+v$session vs,
+v$sql vsq,
+fnd_concurrent_programs_vl fcp
+WHERE fcr.request_id = ”
+AND fcr.oracle_process_id = vp.spid
+AND vs.sql_address = vsq.address
+AND vs.paddr = vp.addr
+AND fcr.concurrent_program_id = fcp.concurrent_program_id;

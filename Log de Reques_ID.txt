@@ -1,0 +1,5 @@
+SELECT fcpa.concurrent_request_id request_id, fcp.node_name Nodo, fcp.logfile_name Log
+FROM fnd_conc_pp_actions fcpa, fnd_concurrent_processes fcp
+WHERE fcpa.processor_id = fcp.concurrent_process_id
+AND fcpa.action_type = 6
+AND fcpa.concurrent_request_id = 41285594;

@@ -1,0 +1,26 @@
+SELECT fcpt.user_concurrent_program_name ,
+  fcp.concurrent_program_name short_name ,
+  fat.application_name program_application_name ,
+  fet.executable_name ,
+  fat1.application_name executable_application_name ,
+  flv.meaning execution_method ,
+  fet.execution_file_name ,
+  fcp.enable_trace
+FROM fnd_concurrent_programs_tl fcpt ,
+  fnd_concurrent_programs fcp ,
+  fnd_application_tl fat ,
+  fnd_executables fet ,
+  fnd_application_tl fat1 ,
+  FND_LOOKUP_VALUES FLV
+WHERE 1                              =1
+AND fcpt.user_concurrent_program_name='Crear Contabilidad - Assets'
+AND fcpt.concurrent_program_id       = fcp.concurrent_program_id
+AND fcpt.application_id              = fcp.application_id
+AND fcp.application_id               = fat.application_id
+AND fcpt.application_id              = fat.application_id
+AND fcp.executable_id                = fet.executable_id
+AND fcp.executable_application_id    = fet.application_id
+AND fet.application_id               = fat1.application_id
+AND flv.lookup_code                  = fet.execution_method_code
+AND FLV.LOOKUP_TYPE                  ='CP_EXECUTION_METHOD_CODE'
+;

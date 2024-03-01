@@ -1,0 +1,25 @@
+SELECT DISTINCT fcp.user_concurrent_program_name,
+                fcp.concurrent_program_name,
+                fcr.request_id,
+                fcr.request_date,
+                flv.meaning status,
+
+                fcr.status_code,
+                fcr.logfile_name,
+                fcr.outfile_name,
+                fcr.argument_text "Program Parameters",
+                 fcr.completion_text,
+                 TO_CHAR(fcr.request_date, 'DD-MON-YYYY HH24:MI:SS') requested
+     , TO_CHAR(fcr.requested_start_date, 'DD-MON-YYYY HH24:MI:SS') requested_start 
+     , TO_CHAR((fcr.requested_start_date), 'HH24:MI:SS') start_time
+  FROM apps.fnd_concurrent_programs_vl fcp,
+       apps.fnd_concurrent_requests    fcr,
+       apps.fnd_lookup_values          flv
+ WHERE fcr.concurrent_program_id = fcp.concurrent_program_id
+   AND trunc(fcr.last_update_date) = trunc(SYSDATE)
+   AND flv.lookup_code = fcr.status_code
+   AND flv.lookup_type = 'CP_STATUS_CODE'
+   AND fcr.phase_code = 'P'
+
+ ORDER BY fcr.request_date desc;
+ 

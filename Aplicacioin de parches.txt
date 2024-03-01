@@ -1,0 +1,55 @@
+﻿APLICACIÓN DE PARCHES
+
+- Revisar si el parche ya se encuentra instalado consultando la tabla ad_bugs
+	> sqlplus apps/<pass>	
+	> select * from ad_bugs where bug_number='#######';
+	* Si no regresa registros es por que el parche aún no ha sido aplicado.
+
+
+- Bajar servicios de aplicaciones
+	$ADMIN_SCRIPTS_HOME/adstpall.sh apps/<password>
+
+- Revisar que no se esten ejecutando procesos del Concurrent Manager
+	> ps -fea | grep FND
+	*En caso de estar en ejecución esperar 10 min aprox para verificar de nuevo.
+
+- Habilitar el modo mantenimiento
+	> adadmin
+	* Aceptar los valores por default
+	* Al preguntar el password de System proporcionarlo según el caso.
+	* Al preguntar el password de APPS proporcionarlo según el caso.
+	* opción 5
+	* opción 1
+	* salir con Enter
+Verificar desde la ruta del parche el nombre del driver, generalmente u######.drv
+	> cd <ruta del parche>
+	> ls
+	*copiar el nombre del drv.
+
+- Desde la ruta descomprimida correr el adpatch
+ [u01/patches/19380682]# adpatch
+	* Aceptar los valores por default
+	* Al preguntar el password de System proporcionarlo según el caso.
+	* Al preguntar el password de APPS proporcionarlo según el caso.
+	* Aceptar el valor del directorio por defecto
+	* Ingresar el nombre del driver, que copiamos anteriormente 
+	* Aceptar el valor de parallel workers
+
+- Revisar si el parche ya se encuentra instalado consultando la tabla ad_bugs
+	> sqlplus apps/<pass>	
+	> select * from ad_bugs where bug_number='#######';
+
+
+- Deshabilitar el modo mantenimiento
+	> adadmin
+	* Aceptar los valores por default
+	* Al preguntar el password de System proporcionarlo según el caso.
+	* Al preguntar el password de APPS proporcionarlo según el caso.
+	* opción 5
+	* opción 2
+	* salir con Enter
+
+- Subir servicios de aplicaciones
+	$ADMIN_SCRIPTS_HOME/adstpall.sh apps/<password>
+
+- Subir servicios (adstrtal.sh apps)

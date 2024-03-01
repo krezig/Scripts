@@ -1,0 +1,20 @@
+#########
+Apps Tier:
+#########
+
+echo $INST_TOP   						(/u01/app/applmgr/fs1/inst/apps/PROD_ebs02)
+sh <INST_TOP>/admin/scripts/adautocfg.sh
+
+cd /u01/app/applmgr/fs1/inst/apps/PROD_ebs02/admin/scripts
+sh adautocfg.sh
+
+#######
+DB Tier:
+#######
+
+echo $RDBMS_ORACLE_HOME				(/u01/app/oracle/12.1.0)
+sh <RDBMS_ORACLE_HOME>/appsutil/scripts/<CONTEXT_NAME>/adautocfg.sh
+
+cd /u01/app/oracle/12.1.0/appsutil/scripts/PROD_ebsdb02
+sh adautocfg.sh	
+

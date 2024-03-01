@@ -1,0 +1,62 @@
+---- 1) Encontrar sesión del REQUEST_ID:
+SELECT a.request_id, d.sid, d.serial# ,d.osuser,d.process , c.SPID
+FROM apps.fnd_concurrent_requests a,
+apps.fnd_concurrent_processes b,
+v$process c,
+v$session d
+WHERE a.controlling_manager = b.concurrent_process_id
+AND c.pid = b.oracle_process_id
+AND b.session_id=d.audsid
+AND a.request_id = 42350473;
+
+---- 2) Encontrar SQL_ID de la sesion del request_id
+Select * 
+from v$session 
+where sid = 216
+AND SERIAL# = 22649;
+
+--ALTER SYSTEM KILL SESSION ',' IMMEDIATE;
+
+---- 3) Con el SQL_ID obtener el QUERY
+SELECT sid, serial#, schemaname, status, osuser, machine, program,type
+FROM v$session
+where SQL_ID = 'fnpyvpk41nd5s';
+
+---- 4)  Datos de la sesión de dicho request_id
+select SQL_TEXT Previo, SQL_FULLTEXT Completo, SQL_ID, EXECUTIONS Ejecuciones, FIRST_LOAD_TIME Inicio, CONCURRENCY_WAIT_TIME, USER_IO_WAIT_TIME, PARSING_SCHEMA_NAME Esquema,ELAPSED_TIME,OBJECT_STATUS 
+from V$SQL
+where SQL_ID = 'fnpyvpk41nd5s';
+
+-----5) Forzar cambio de status de concurrente a detenido
+update apps.fnd_concurrent_requests set phase_code='C' , status_code='X' where request_id='&REQUEST_ID';
+==========================================================================
+
+SELECT A.REQUEST_ID, D.SID, D.SERIAL#, D.OSUSER, D.PROCESS, C.SPID,
+E.SQL_TEXT
+FROM APPS.FND_CONCURRENT_REQUESTS A,
+APPS.FND_CONCURRENT_PROCESSES B,
+V$PROCESS C,
+V$SESSION D,
+V$SQL E
+WHERE A.CONTROLLING_MANAGER = B.CONCURRENT_PROCESS_ID
+AND C.PID = B.ORACLE_PROCESS_ID
+AND B.SESSION_ID = D.AUDSID
+AND D.SQL_ADDRESS = E.ADDRESS
+AND A.REQUEST_ID = '&REQUEST_ID';
+
+============================================================================
+
+select REQUEST_ID,ORACLE_PROCESS_ID,OS_PROCESS_Id from apps.fnd_concurrent_requests where
+ORACLE_PROCESS_ID='&PID';
+
+
+
+SELECT a.request_id, d.sid, d.serial# ,d.osuser,d.process , c.SPID
+FROM apps.fnd_concurrent_requests a,
+apps.fnd_concurrent_processes b,
+v$process c,
+v$session d
+WHERE a.controlling_manager = b.concurrent_process_id
+AND c.pid = b.oracle_process_id
+AND b.session_id=d.audsid
+AND a.request_id = 2424676;
